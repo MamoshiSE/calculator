@@ -62,6 +62,8 @@
             this.panel1.Controls.Add(this.resultBox);
             this.panel1.ForeColor = System.Drawing.Color.Black;
             this.panel1.Location = new System.Drawing.Point(1, 1);
+            this.panel1.MaximumSize = new System.Drawing.Size(295, 289);
+            this.panel1.MinimumSize = new System.Drawing.Size(295, 289);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(295, 289);
             this.panel1.TabIndex = 0;
@@ -218,9 +220,9 @@
             this.decimalButton.Name = "decimalButton";
             this.decimalButton.Size = new System.Drawing.Size(58, 52);
             this.decimalButton.TabIndex = 15;
-            this.decimalButton.Text = ".";
+            this.decimalButton.Text = ",";
             this.decimalButton.UseVisualStyleBackColor = false;
-            this.decimalButton.Click += new System.EventHandler(this.decimalButton_Click);
+            this.decimalButton.Click += new System.EventHandler(this.button_Click);
             // 
             // zero
             // 
@@ -371,10 +373,10 @@
             this.calcDisplay.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.calcDisplay.Enabled = false;
             this.calcDisplay.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.calcDisplay.Location = new System.Drawing.Point(172, 12);
+            this.calcDisplay.Location = new System.Drawing.Point(11, 12);
             this.calcDisplay.Name = "calcDisplay";
             this.calcDisplay.ReadOnly = true;
-            this.calcDisplay.Size = new System.Drawing.Size(100, 15);
+            this.calcDisplay.Size = new System.Drawing.Size(261, 15);
             this.calcDisplay.TabIndex = 1;
             this.calcDisplay.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
@@ -383,7 +385,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(639, 363);
+            this.ClientSize = new System.Drawing.Size(295, 288);
             this.Controls.Add(this.panel1);
             this.KeyPreview = true;
             this.Name = "mainForm";

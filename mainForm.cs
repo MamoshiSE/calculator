@@ -11,16 +11,17 @@ using System.Windows.Forms;
 namespace Calculator
 {
     public partial class mainForm : Form
-        
+
     {
         // fick idén till operationerna från https://www.youtube.com/watch?v=Is1EHXFhEe4
         Double value = 0;
         String calc = "";
         bool operation_pressed;
+        bool divByZero;
         public mainForm()
         {
-             
-          
+
+
             InitializeComponent();
             plus.FlatAppearance.BorderSize = 0;
             minus.FlatAppearance.BorderSize = 0;
@@ -41,17 +42,32 @@ namespace Calculator
             clearInput.FlatAppearance.BorderSize = 0;
             backSpaceButton.FlatAppearance.BorderSize = 0;
 
-            
-            
+
+
         }
-        
+
 
         private void mainForm_KeyPress(object sender, KeyPressEventArgs e)
         {
+            // Kunde inte hitta strängen för backspace - gjorde med nyckeln istället
+            if(e.KeyChar == 8)
+            {
+                backSpaceButton.PerformClick();
+            }
+
+           /* if (e.KeyChar == 13)
+            {
+                equals.PerformClick();
+            } */
             switch (e.KeyChar.ToString())
             {
-                case ".":
+                case ",":
                     decimalButton.PerformClick();
+                    break;
+
+
+                case "c":
+                    clearInput.PerformClick();
                     break;
 
                 case "0":
@@ -114,17 +130,23 @@ namespace Calculator
                     equals.PerformClick();
                     break;
 
+                case "Enter":
+                    equals.PerformClick();
+                    break;
+
                 default:
                     break;
             }
         }
-        
+
         private void backSpaceButton_Click(object sender, EventArgs e)
         {
-            if (resultBox.Text.Length == 1)
+            if (resultBox.Text != "" && calcDisplay.Text != "")
             {
                 resultBox.Text = resultBox.Text.Substring(0, resultBox.Text.Length - 1);
+                calcDisplay.Text = calcDisplay.Text.Substring(0, calcDisplay.Text.Length - 1);
             }
+
         }
 
         private void button_Click(object sender, EventArgs e)
@@ -135,29 +157,26 @@ namespace Calculator
             }
             operation_pressed = false;
             Button pressed = (Button)sender;
-           
-            resultBox.Text += pressed.Text;
-            calcDisplay.Text += pressed.Text;
-        }
 
-      
-      
+            if (pressed.Text == ",")
+            {
+                if (!resultBox.Text.Contains(","))
+                {
+                    resultBox.Text += pressed.Text;
+                    calcDisplay.Text += pressed.Text;
+                }
+            }
+            else
+            {
 
-        private void decimalButton_Click(object sender, EventArgs e)
-        {
-          
-            if (!resultBox.Text.Contains(",")  && resultBox.Text.Length == 0)
-            {
-                resultBox.Text += "0";
-                resultBox.Text += ".";
-                calcDisplay.Text += "0";
-                calcDisplay.Text += ".";
-            } else if (!resultBox.Text.Contains("."))
-            {
-                resultBox.Text += ".";
-                calcDisplay.Text += ".";
+                resultBox.Text += pressed.Text;
+                calcDisplay.Text += pressed.Text;
             }
         }
+
+
+
+
 
         private void clearInput_Click(object sender, EventArgs e)
         {
@@ -169,11 +188,30 @@ namespace Calculator
         private void operation_Click(object sender, EventArgs e)
         {
             Button pressed = (Button)sender;
-            calc = pressed.Text;
-            value = Double.Parse(resultBox.Text);
-            operation_pressed = true;
-            //resultBox.Text = "";
-            calcDisplay.Text += $" {calc} ";
+            if (divByZero == true)
+            {
+                calcDisplay.Text = resultBox.Text;
+                divByZero = false;
+            }
+
+            
+            if (value != 0)
+            {
+
+                equals.PerformClick();
+                operation_pressed = true;
+                calc = pressed.Text;
+                calcDisplay.Text = $"{resultBox.Text} {calc} ";
+            } 
+            else
+            {
+
+                calc = pressed.Text;
+                value = Double.Parse(resultBox.Text);
+                operation_pressed = true;
+                calcDisplay.Text = $"{resultBox.Text} {calc} ";
+            }
+
         }
 
         private void equals_Click(object sender, EventArgs e)
@@ -184,22 +222,42 @@ namespace Calculator
                     resultBox.Text = (Double.Parse(resultBox.Text) + value).ToString();
                     break;
 
-                case "-":
+                case "−":
                     resultBox.Text = (value - Double.Parse(resultBox.Text)).ToString();
                     break;
 
-                case "*":
+                case "x":
                     resultBox.Text = (value * Double.Parse(resultBox.Text)).ToString();
                     break;
 
-                case "/":
+                case "÷":
+
                     resultBox.Text = (value / Double.Parse(resultBox.Text)).ToString();
+
                     break;
 
                 default:
                     break;
             }
-            operation_pressed = false;
+            if (calc == "÷")
+            {
+                if (resultBox.Text == "∞")
+                {
+                    divByZero = true;
+                    calcDisplay.Text = "Divison by zero not allowed";
+                    value = 0;
+                    resultBox.Text = "0";
+                }
+            }
+            else
+            {
+                value = Double.Parse(resultBox.Text);
+                calcDisplay.Text = resultBox.Text;
+            
+                operation_pressed = false;
+
+            }
         }
     }
 }
+
