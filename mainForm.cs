@@ -13,16 +13,19 @@ namespace Calculator
     public partial class mainForm : Form
 
     {
-        // fick idén till operationerna från https://www.youtube.com/watch?v=Is1EHXFhEe4
+        
         Double value = 0;
+        Double value2 = 0;
         String calc = "";
         bool operation_pressed;
         bool divByZero;
+        String operatorSign;
         public mainForm()
         {
 
 
             InitializeComponent();
+            // För bli av med knapparnas kanter
             plus.FlatAppearance.BorderSize = 0;
             minus.FlatAppearance.BorderSize = 0;
             multiply.FlatAppearance.BorderSize = 0;
@@ -49,25 +52,12 @@ namespace Calculator
 
         private void mainForm_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // Kunde inte hitta strängen för backspace - gjorde med nyckeln istället
-            if(e.KeyChar == 8)
-            {
-                backSpaceButton.PerformClick();
-            }
-
-           /* if (e.KeyChar == 13)
-            {
-                equals.PerformClick();
-            } */
+            // Beroende på vilken knapp som klickas så utförs den knappens händelse
+      
             switch (e.KeyChar.ToString())
             {
                 case ",":
                     decimalButton.PerformClick();
-                    break;
-
-
-                case "c":
-                    clearInput.PerformClick();
                     break;
 
                 case "0":
@@ -130,10 +120,6 @@ namespace Calculator
                     equals.PerformClick();
                     break;
 
-                case "Enter":
-                    equals.PerformClick();
-                    break;
-
                 default:
                     break;
             }
@@ -151,13 +137,21 @@ namespace Calculator
 
         private void button_Click(object sender, EventArgs e)
         {
+            // ifall "första värdet" är inslaget eller värdet är 0 så vill vi rensa inputs textboxen
             if (resultBox.Text == "0" || operation_pressed)
             {
                 resultBox.Text = "";
+                
+            }
+            // för att bli av med "Divide by zero" texten
+            if (divByZero == true)
+            {
+                calcDisplay.Text = resultBox.Text;
             }
             operation_pressed = false;
             Button pressed = (Button)sender;
 
+            // kollar så att man inte kan slå in fler än 1 decimal
             if (pressed.Text == ",")
             {
                 if (!resultBox.Text.Contains(","))
@@ -180,13 +174,16 @@ namespace Calculator
 
         private void clearInput_Click(object sender, EventArgs e)
         {
-            resultBox.Text = "";
+            resultBox.Text = "0";
             calcDisplay.Text = "";
             value = 0;
+            value2 = 0;
         }
 
         private void operation_Click(object sender, EventArgs e)
         {
+            // Kollar vilken av operationerna som ska utföras
+            // fick idén till operationerna från https://www.youtube.com/watch?v=Is1EHXFhEe4
             Button pressed = (Button)sender;
             if (divByZero == true)
             {
@@ -194,20 +191,13 @@ namespace Calculator
                 divByZero = false;
             }
 
-            
-            if (value != 0)
-            {
-
-                equals.PerformClick();
-                operation_pressed = true;
-                calc = pressed.Text;
-                calcDisplay.Text = $"{resultBox.Text} {calc} ";
-            } 
             else
             {
 
                 calc = pressed.Text;
                 value = Double.Parse(resultBox.Text);
+                value2 = 0;
+                operatorSign = calc;
                 operation_pressed = true;
                 calcDisplay.Text = $"{resultBox.Text} {calc} ";
             }
@@ -216,22 +206,53 @@ namespace Calculator
 
         private void equals_Click(object sender, EventArgs e)
         {
+            // Vid upprepade tryck av "=" så repeteras senaste operationen
+            if (operation_pressed == false && (calc == "" || calc == "=") && divByZero == false)
+            {
+                switch (operatorSign)
+                {
+                    case "+":
+                        resultBox.Text = (value + value2).ToString();
+                        break;
+
+                    case "−":
+                        resultBox.Text = (value - value2).ToString();
+                        break;
+
+                    case "x":
+                        resultBox.Text = (value * value2).ToString();
+                        break;
+
+                    case "÷":
+                        resultBox.Text = (value / value2).ToString();
+                        break;
+
+                    default:
+                        break;
+                }
+                
+            }
+           // Utför en av operationerna beroende på vilken som är tryckt.
             switch (calc)
             {
                 case "+":
-                    resultBox.Text = (Double.Parse(resultBox.Text) + value).ToString();
+                    
+                    value2 = Double.Parse(resultBox.Text);
+                    resultBox.Text = (value + Double.Parse(resultBox.Text)).ToString();
                     break;
 
                 case "−":
+                    value2 = Double.Parse(resultBox.Text);
                     resultBox.Text = (value - Double.Parse(resultBox.Text)).ToString();
                     break;
 
                 case "x":
+                    value2 = Double.Parse(resultBox.Text);
                     resultBox.Text = (value * Double.Parse(resultBox.Text)).ToString();
                     break;
 
                 case "÷":
-
+                    value2 = Double.Parse(resultBox.Text);
                     resultBox.Text = (value / Double.Parse(resultBox.Text)).ToString();
 
                     break;
@@ -239,23 +260,43 @@ namespace Calculator
                 default:
                     break;
             }
-            if (calc == "÷")
+            // Kollar ifall man försökt dividera med 0
+            if (calc == "÷" && resultBox.Text  == "∞")
             {
-                if (resultBox.Text == "∞")
-                {
+                
                     divByZero = true;
                     calcDisplay.Text = "Divison by zero not allowed";
                     value = 0;
+                    value2 = 0;
                     resultBox.Text = "0";
-                }
+                    calc = "";
+                
             }
             else
             {
                 value = Double.Parse(resultBox.Text);
                 calcDisplay.Text = resultBox.Text;
-            
+                calc = "";
                 operation_pressed = false;
 
+            }
+        }
+        // Input från tangentbord. enter är = , delete är C (clear knappen), backspace tar bort senaste inmatningen 
+        private void mainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                equals.PerformClick();
+            }
+
+            if (e.KeyCode == Keys.Delete)
+            {
+                clearInput.PerformClick();
+            }
+
+            if (e.KeyCode == Keys.Back)
+            {
+                backSpaceButton.PerformClick();
             }
         }
     }
